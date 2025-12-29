@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "inngest:dev": "inngest dev",
+    "dev:all": "mprocs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
