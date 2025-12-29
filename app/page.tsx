@@ -12,6 +12,8 @@ const Page = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
+  const testAi = useMutation(trpc.testGoogleAi.mutationOptions());
+
   const { data } = useQuery(trpc.getWorkflows.queryOptions());
 
   const create = useMutation(
@@ -25,6 +27,7 @@ const Page = () => {
     <div>
       {JSON.stringify(data, null, 2)}
       <Button onClick={() => create.mutate()}>Create Workflow</Button>
+      <Button onClick={() => testAi.mutate()}>Test Google AI</Button>
     </div>
   );
 };
