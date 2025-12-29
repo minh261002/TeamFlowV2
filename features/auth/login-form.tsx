@@ -26,10 +26,11 @@ import {
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Loader2Icon } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -45,7 +46,21 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    console.log(data);
+    await authClient.signIn.email(
+      {
+        email: data.email,
+        password: data.password,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message);
+        },
+      }
+    );
   };
 
   const isPending = form.formState.isSubmitting;
@@ -88,7 +103,12 @@ const LoginForm = () => {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="example@gmail.com" />
+                          <Input
+                            type="email"
+                            {...field}
+                            placeholder="example@gmail.com"
+                            tabIndex={1}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -106,6 +126,7 @@ const LoginForm = () => {
                             {...field}
                             type="password"
                             placeholder="********"
+                            tabIndex={2}
                           />
                         </FormControl>
                         <FormMessage />
@@ -113,7 +134,12 @@ const LoginForm = () => {
                     )}
                   />
 
-                  <Button type="submit" disabled={isPending} className="w-full">
+                  <Button
+                    type="submit"
+                    tabIndex={3}
+                    disabled={isPending}
+                    className="w-full"
+                  >
                     {isPending ? (
                       <Loader2Icon className="animate-spin h-5 w-5" />
                     ) : (
