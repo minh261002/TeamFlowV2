@@ -1,8 +1,12 @@
-import prisma from "@/lib/db";
-import React from "react";
+"use client";
 
-const Page = async () => {
-  const users = await prisma.user.findMany();
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
+
+const Page = () => {
+  const trpc = useTRPC();
+  const { data: users } = useQuery(trpc.getUsers.queryOptions());
+
   return <div>{JSON.stringify(users, null)}</div>;
 };
 
