@@ -23,37 +23,47 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Loader2Icon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 
-const loginSchema = z.object({
-  email: z.email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters long"),
-});
+const loginSchema = z
+  .object({
+    email: z.email("Please enter a valid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters long"),
+    confirmPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters long"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword", "password"],
+  });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type SignUpFormValues = z.infer<typeof loginSchema>;
 
-const LoginForm = () => {
+const SignUpForm = () => {
   const router = useRouter();
-  const form = useForm<LoginFormValues>({
+  const form = useForm<SignUpFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
-    await authClient.signIn.email(
+  const onSubmit = async (data: SignUpFormValues) => {
+    await authClient.signUp.email(
       {
+        name: data.email,
         email: data.email,
         password: data.password,
         callbackURL: "/",
       },
       {
         onSuccess: () => {
+          toast.success("Account created successfully");
           router.push("/");
         },
         onError: (ctx) => {
@@ -69,8 +79,10 @@ const LoginForm = () => {
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader className="text-center">
-          <CardTitle>Welcome back!</CardTitle>
-          <CardDescription>Please login to your account.</CardDescription>
+          <CardTitle>Get started!</CardTitle>
+          <CardDescription>
+            Please create your account to continue.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -83,6 +95,12 @@ const LoginForm = () => {
                     type="button"
                     disabled={isPending}
                   >
+                    <Image
+                      src="/github.svg"
+                      alt="Github"
+                      width={16}
+                      height={16}
+                    />
                     Continue with Github
                   </Button>
                   <Button
@@ -91,6 +109,12 @@ const LoginForm = () => {
                     type="button"
                     disabled={isPending}
                   >
+                    <Image
+                      src="/google.svg"
+                      alt="Google"
+                      width={16}
+                      height={16}
+                    />
                     Continue with Google
                   </Button>
                 </div>
@@ -126,7 +150,28 @@ const LoginForm = () => {
                             {...field}
                             type="password"
                             placeholder="********"
+                            autoComplete="off"
                             tabIndex={2}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="password"
+                            placeholder="********"
+                            autoComplete="off"
+                            tabIndex={3}
                           />
                         </FormControl>
                         <FormMessage />
@@ -136,24 +181,24 @@ const LoginForm = () => {
 
                   <Button
                     type="submit"
-                    tabIndex={3}
                     disabled={isPending}
                     className="w-full"
+                    tabIndex={4}
                   >
                     {isPending ? (
                       <Loader2Icon className="animate-spin h-5 w-5" />
                     ) : (
-                      "Login"
+                      "Sign Up"
                     )}
                   </Button>
                 </div>
                 <div className="text-center text-sm">
-                  Don&apos;t have an account?{" "}
+                  Already have an account?{" "}
                   <Link
-                    href="/sign-up"
+                    href="/login"
                     className={"underline underline-offset-4"}
                   >
-                    Sign up
+                    Login
                   </Link>
                 </div>
               </div>
@@ -165,4 +210,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default SignUpForm;
