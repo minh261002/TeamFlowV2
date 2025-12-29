@@ -1,13 +1,16 @@
 "use client";
 
-import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 
 const Page = () => {
-  const trpc = useTRPC();
-  const { data: users } = useQuery(trpc.getUsers.queryOptions());
-
-  return <div>{JSON.stringify(users, null)}</div>;
+  const { data } = authClient.useSession();
+  return (
+    <div>
+      {JSON.stringify(data, null, 2)}
+      <Button onClick={() => authClient.signOut()}>Logout</Button>
+    </div>
+  );
 };
 
 export default Page;
