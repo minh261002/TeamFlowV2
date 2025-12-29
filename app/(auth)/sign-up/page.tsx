@@ -1,4 +1,4 @@
-import SignUpForm from "@/features/auth/sign-up-form";
+import SignUpForm from "@/features/auth/components/sign-up-form";
 import { requireUnAuth } from "@/lib/auth-utils";
 import React from "react";
 
