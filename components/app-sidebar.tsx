@@ -26,6 +26,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useSignOut } from "@/hooks/use-signout";
+import { useSubscription } from "@/features/subscriptions/hooks/use-subsription";
+import { useHasActiveSubscription } from "../features/subscriptions/hooks/use-subsription";
 
 const menuItems = [
   {
@@ -51,9 +53,9 @@ const menuItems = [
 ];
 
 const AppSidebar = () => {
-  const router = useRouter();
   const pathname = usePathname();
-
+  const { hasActiveSubscription, isLoading } = useHasActiveSubscription();
+  console.log("hasActiveSubscription", hasActiveSubscription);
   const { handleSignOut } = useSignOut();
 
   return (
@@ -103,24 +105,28 @@ const AppSidebar = () => {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Upgrade to Pro"
-              asChild
-              className="gap-x-4 h-10 px-4"
-            >
-              <span className="flex items-center gap-x-4">
-                <StarIcon className="size-4" />
-                <span>Upgrade to Pro</span>
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {!hasActiveSubscription && !isLoading && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip="Upgrade to Pro"
+                asChild
+                className="gap-x-4 h-10 px-4 cursor-pointer"
+                onClick={() => authClient.checkout({ slug: "pro-plan" })}
+              >
+                <span className="flex items-center gap-x-4">
+                  <StarIcon className="size-4" />
+                  <span>Upgrade to Pro</span>
+                </span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
 
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Billing Portal"
               asChild
-              className="gap-x-4 h-10 px-4"
+              className="gap-x-4 h-10 px-4 cursor-pointer"
+              onClick={() => authClient.customer.portal()}
             >
               <span className="flex items-center gap-x-4">
                 <CreditCardIcon className="size-4 " />
